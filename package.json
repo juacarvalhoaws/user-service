@@ -1,0 +1,30 @@
+{
+    "name": "user-service",
+    "version": "1.0.0",
+    "description": "user service API",
+    "main": "handler.js",
+    "directories": {
+        "test": "tests"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "aws-sdk": "^2.1664.0",
+        "joi": "^17.13.3",
+        "uuid": "^10.0.0"
+    },
+    "devDependencies": {
+        "@aws-sdk/client-dynamodb": "^3.620.0",
+        "@aws-sdk/lib-dynamodb": "^3.620.0",
+        "aws-sdk-client-mock": "^4.0.1",
+        "aws-sdk-mock": "^6.0.4",
+        "jest": "^29.7.0"
+    },
+    "scripts": {
+        "test": "jest"
+    },
+    "jest": {
+        "testEnvironment": "node"
+    }
+}

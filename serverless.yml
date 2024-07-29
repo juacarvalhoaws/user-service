@@ -1,0 +1,77 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: juarez
+# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
+app: user-service
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: user-service
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+  environment:
+    USERS_TABLE: users
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.USERS_TABLE}
+
+functions:
+  createUser:
+    handler: handler.createUser
+    events:
+      - http:
+          path: users
+          method: post
+          request:
+            schemas:
+              application/json: ${file(models/createUserModel.json)}
+
+  getUser:
+    handler: handler.getUser
+    events:
+      - http:
+          path: users/{UserID}
+          method: get
+
+  updateUser:
+    handler: handler.updateUser
+    events:
+      - http:
+          path: users/{UserID}
+          method: put
+          request:
+            schemas:
+              application/json: ${file(models/updateUserModel.json)}
+
+  deleteUser:
+    handler: handler.deleteUser
+    events:
+      - http:
+          path: users/{UserID}
+          method: delete
+
+resources:
+  Resources:
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.USERS_TABLE}
+        AttributeDefinitions:
+          - AttributeName: UserID
+            AttributeType: S
+        KeySchema:
+          - AttributeName: UserID
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+
