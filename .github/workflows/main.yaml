@@ -38,8 +38,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Deploy to AWS
-        run: npx serverless deploy
+      - name: Serverless Framework Action
+        uses: serverless/github-action@v3
+        with:
+          args: deploy
+        env:
+          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
 
   cleanup:
     runs-on: ubuntu-latest
@@ -56,3 +60,5 @@ jobs:
 
       - name: Remove Serverless Service
         run: npx serverless remove
+        env:
+          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
