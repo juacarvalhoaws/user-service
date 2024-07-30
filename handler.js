@@ -1,5 +1,5 @@
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, PutCommand, GetCommand, UpdateCommand, DeleteCommand } = require("@aws-sdk/lib-dynamodb");
+const { DynamoDBDocumentClient, PutCommand, GetCommand, UpdateCommand, DeleteCommand, QueryCommand } = require("@aws-sdk/lib-dynamodb");
 const { v4: uuidv4 } = require("uuid");
 const Joi = require("joi");
 
@@ -24,6 +24,23 @@ module.exports.createUser = async (event) => {
       body: JSON.stringify({ error: error.details[0].message }),
     };
   }
+
+   // Check for existing email
+   const existingUser = await ddbDocClient.send(new QueryCommand({
+    TableName: USERS_TABLE,
+    IndexName: "EmailIndex",
+    KeyConditionExpression: "email = :email",
+    ExpressionAttributeValues: {
+      ":email": data.email,
+    },
+  }));
+
+  if (existingUser.Count > 0) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Email already exists" }),
+    };
+  } 
 
   const UserID = uuidv4();
   const params = {

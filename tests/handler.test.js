@@ -1,5 +1,5 @@
 const { mockClient } = require('aws-sdk-client-mock');
-const { DynamoDBDocumentClient, PutCommand, GetCommand, UpdateCommand, DeleteCommand } = require("@aws-sdk/lib-dynamodb");
+const { DynamoDBDocumentClient, PutCommand, GetCommand, UpdateCommand, DeleteCommand, QueryCommand } = require("@aws-sdk/lib-dynamodb");
 const { createUser, getUser, updateUser, deleteUser } = require('../handler');
 
 const ddbMock = mockClient(DynamoDBDocumentClient);
@@ -38,6 +38,7 @@ describe('CRUD operations', () => {
 
   describe('createUser', () => {
     it('should create a user successfully', async () => {
+      ddbMock.on(QueryCommand).resolves({ Count: 0 });
       ddbMock.on(PutCommand).resolves({});
       const result = await createUser(validEventTemplate);
       expect(result.statusCode).toBe(201);
@@ -51,9 +52,17 @@ describe('CRUD operations', () => {
     });
 
     it('should return server error on DynamoDB failure', async () => {
+      ddbMock.on(QueryCommand).resolves({ Count: 0 });
       ddbMock.on(PutCommand).rejects(new Error('DynamoDB error'));
       const result = await createUser(validEventTemplate);
       expect(result.statusCode).toBe(500);
+      expect(JSON.parse(result.body)).toHaveProperty('error');
+    });
+
+    it('should return error if email already exists', async () => {
+      ddbMock.on(QueryCommand).resolves({ Count: 1 });
+      const result = await createUser(validEventTemplate);
+      expect(result.statusCode).toBe(400);
       expect(JSON.parse(result.body)).toHaveProperty('error');
     });
   });
