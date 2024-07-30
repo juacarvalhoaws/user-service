@@ -5,6 +5,8 @@ app: user-service
 # "service" is the name of this project. This will also be added to your AWS resource names.
 service: user-service
 
+frameworkVersion: '4'
+
 provider:
   name: aws
   runtime: nodejs20.x
@@ -24,7 +26,6 @@ provider:
           Resource:
             - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.USERS_TABLE}
             - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.USERS_TABLE}/index/*
-
 
 functions:
   createUser:
@@ -84,12 +85,18 @@ resources:
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
           - IndexName: NameIndex
             KeySchema:
               - AttributeName: name
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
