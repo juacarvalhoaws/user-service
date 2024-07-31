@@ -7,8 +7,8 @@ This project is a CRUD service for managing users, built with AWS Lambda, API Ga
 Before you begin, ensure you have the following installed on your local machine:
 
 - Node.js (version 20.x)
-- npm (Node Package Manager)
-- Serverless Framework
+- npm (Node Package Manager) (version 10.8.1)
+- Serverless Framework (version 4.1.18)
 
 ## Installation
 
@@ -23,6 +23,16 @@ Before you begin, ensure you have the following installed on your local machine:
    ```sh
    npm install
 
+3. Run Unit Tests
+
+   ```sh
+   npm test
+
+4. Deploy service 
+
+   ```sh
+   serverless deploy
+  
 # Testing the RESTFul APIs
 ## Using Postman
 
