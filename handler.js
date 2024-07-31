@@ -166,7 +166,7 @@ module.exports.updateUser = async (event) => {
   }
 };
 
-module.exports.deleteUser = async (event) => {
+/* module.exports.deleteUser = async (event) => {
   const params = {
     TableName: USERS_TABLE,
     Key: {
@@ -176,6 +176,48 @@ module.exports.deleteUser = async (event) => {
 
   try {
     await ddbDocClient.send(new DeleteCommand(params));
+    return {
+      statusCode: 204,
+      body: JSON.stringify({}),
+    };
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: "Could not delete user" }),
+    };
+  }
+};
+ */
+
+module.exports.deleteUser = async (event) => {
+  const userId = event.pathParameters.UserID;
+
+  const getParams = {
+    TableName: USERS_TABLE,
+    Key: {
+      UserID: userId,
+    },
+  };
+
+  const deleteParams = {
+    TableName: USERS_TABLE,
+    Key: {
+      UserID: userId,
+    },
+  };
+
+  try {
+    // Check if the user exists
+    const getResult = await ddbDocClient.send(new GetCommand(getParams));
+    if (!getResult.Item) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ error: "User not found" }),
+      };
+    }
+
+    // Delete the user
+    await ddbDocClient.send(new DeleteCommand(deleteParams));
     return {
       statusCode: 204,
       body: JSON.stringify({}),

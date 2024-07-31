@@ -1,69 +1,65 @@
-<!--
-title: 'AWS Simple HTTP Endpoint example in NodeJS'
-description: 'This template demonstrates how to make a simple HTTP API with Node.js running on AWS Lambda and API Gateway using the Serverless Framework.'
-layout: Doc
-framework: v4
-platform: AWS
-language: nodeJS
-authorLink: 'https://github.com/serverless'
-authorName: 'Serverless, Inc.'
-authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
--->
+# User CRUD service
 
-# Serverless Framework Node HTTP API on AWS
+This project is a CRUD service for managing users, built with AWS Lambda, API Gateway, and DynamoDB, using the Serverless framework. It includes endpoints to create, read, update, and delete users, with Unit tests, and integration tests using Postman.
 
-This template demonstrates how to make a simple HTTP API with Node.js running on AWS Lambda and API Gateway using the Serverless Framework.
+## Prerequisites
 
-This template does not include any kind of persistence (database). For more advanced examples, check out the [serverless/examples repository](https://github.com/serverless/examples/) which includes Typescript, Mongo, DynamoDB and other examples.
+Before you begin, ensure you have the following installed on your local machine:
 
-## Usage
+- Node.js (version 20.x)
+- npm (Node Package Manager)
+- Serverless Framework
 
-### Deployment
+## Installation
 
-In order to deploy the example, you need to run the following command:
+1. Clone the repository:
 
-```
-serverless deploy
-```
+   ```sh
+   git clone https://github.com/juacarvalhoaws/user-service.git
+   cd user-service
 
-After running deploy, you should see output similar to:
+2. Install the dependencies
 
-```
-Deploying "serverless-http-api" to stage "dev" (us-east-1)
+   ```sh
+   npm install
 
-✔ Service deployed to stack serverless-http-api-dev (91s)
+# Testing the RESTFul APIs
+## Using Postman
 
-endpoint: GET - https://xxxxxxxxxx.execute-api.us-east-1.amazonaws.com/
-functions:
-  hello: serverless-http-api-dev-hello (1.6 kB)
-```
+1. Import the Postman collection:
+  . Open Postman
+  . Click on `Import` in the top left corner.
+  . Select `Import File`.
+  . Choose the `tests/user-api-tests.postman_collection.json` file from the repository.
 
-_Note_: In current form, after deployment, your API is public and can be invoked by anyone. For production deployments, you might want to configure an authorizer. For details on how to do that, refer to [HTTP API (API Gateway V2) event docs](https://www.serverless.com/framework/docs/providers/aws/events/http-api).
+2. Run the requests in the collection
+  . You can now run the requests in the `User API Tests` collection to test the endpoints.
 
-### Invocation
+## GitHub Actions CI/CD
 
-After successful deployment, you can call the created application via HTTP:
+The project includes a GitHub Actions workflow to run the tests automatically on push or pull request to the main branch. The workflow is defined in `.github/workflows/main.yml`.
 
-```
-curl https://xxxxxxx.execute-api.us-east-1.amazonaws.com/
-```
+The workflow performs the Unit tests, and also deploys the service via CloudFormation.
 
-Which should result in response similar to:
+## Project Structure
 
-```json
-{ "message": "Go Serverless v4! Your function executed successfully!" }
-```
+- **handler.js**: Contains the Lambda functions for the CRUD operations.
+- **serverless.yml**: Serverless framework configuration file.
+- **tests/**: Directory containing the Postman collection for integration tests and Unit tests.
+- **.github/workflows/**: Directory containing GitHub Actions workflows.
 
-### Local development
+## Endpoints
 
-The easiest way to develop and test your function is to use the `dev` command:
+ - **POST - https://qwzj7d4ouk.execute-api.us-east-1.amazonaws.com/dev/users**: Create a new User.
+ - **GET - https://qwzj7d4ouk.execute-api.us-east-1.amazonaws.com/dev/users**: Retrieve all user with pagination.
+ - **GET - https://qwzj7d4ouk.execute-api.us-east-1.amazonaws.com/dev/users/{UserID}**: Retrieve details of a specific user.
+ - **PUT - https://qwzj7d4ouk.execute-api.us-east-1.amazonaws.com/dev/users/{UserID}**: Update details of a specific user.
+ - **DELETE - https://qwzj7d4ouk.execute-api.us-east-1.amazonaws.com/dev/users/{UserID}**:  Delete a specific user.
 
-```
-serverless dev
-```
+## Error Handling
 
-This will start a local emulator of AWS Lambda and tunnel your requests to and from AWS Lambda, allowing you to interact with your function as if it were running in the cloud.
+The service implements thorough error handling to return descriptive error messages and suitable HTTP status codes for various types of errors.
 
-Now you can invoke the function as before, but this time the function will be executed locally. Now you can develop your function locally, invoke it, and see the results immediately without having to re-deploy.
+## Contributing
 
-When you are done developing, don't forget to run `serverless deploy` to deploy the function to the cloud.
+Contributions are welcome! Please submit a pull request or open an issue to discuss any changes.
