@@ -132,17 +132,51 @@ describe('CRUD operations', () => {
   });
 
   describe('deleteUser', () => {
+    beforeEach(() => {
+      ddbMock.reset();
+    });
+  
     it('should delete a user successfully', async () => {
-      ddbMock.on(DeleteCommand).resolves({});
-      const result = await deleteUser({ pathParameters: { UserID: '1' } });
+      const event = {
+        pathParameters: { UserID: '1' }
+      };
+  
+      ddbMock.on(GetCommand, { TableName: USERS_TABLE, Key: { UserID: '1' } }).resolves({
+        Item: { UserID: '1', name: 'John Doe' }
+      });
+  
+      ddbMock.on(DeleteCommand, { TableName: USERS_TABLE, Key: { UserID: '1' } }).resolves({});
+  
+      const result = await deleteUser(event);
       expect(result.statusCode).toBe(204);
     });
-
-    it('should return server error on DynamoDB failure', async () => {
-      ddbMock.on(DeleteCommand).rejects(new Error('DynamoDB error'));
-      const result = await deleteUser({ pathParameters: { UserID: '1' } });
+  
+    it('should return 404 if the user does not exist', async () => {
+      const event = {
+        pathParameters: { UserID: '1' }
+      };
+  
+      ddbMock.on(GetCommand, { TableName: USERS_TABLE, Key: { UserID: '1' } }).resolves({});
+  
+      const result = await deleteUser(event);
+      expect(result.statusCode).toBe(404);
+      expect(JSON.parse(result.body)).toHaveProperty('error', 'User not found');
+    });
+  
+    it('should return 500 if there is an error deleting the user', async () => {
+      const event = {
+        pathParameters: { UserID: '1' }
+      };
+  
+      ddbMock.on(GetCommand, { TableName: USERS_TABLE, Key: { UserID: '1' } }).resolves({
+        Item: { UserID: '1', name: 'John Doe' }
+      });
+  
+      ddbMock.on(DeleteCommand, { TableName: USERS_TABLE, Key: { UserID: '1' } }).rejects(new Error('DynamoDB error'));
+  
+      const result = await deleteUser(event);
       expect(result.statusCode).toBe(500);
-      expect(JSON.parse(result.body)).toHaveProperty('error');
+      expect(JSON.parse(result.body)).toHaveProperty('error', 'Could not delete user');
     });
   });
 });
