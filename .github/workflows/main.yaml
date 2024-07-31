@@ -45,6 +45,14 @@ jobs:
         env:
           SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
 
+      - name: Wait for Serverless to be ready
+        run: sleep 10          
+
+      - name: Run Newman tests
+        run: |
+          npm install -g newman
+          newman run tests/user-service.postman_collection.json                
+
   cleanup:
     runs-on: ubuntu-latest
     if: always()

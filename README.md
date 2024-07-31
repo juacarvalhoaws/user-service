@@ -39,7 +39,7 @@ Before you begin, ensure you have the following installed on your local machine:
 
 The project includes a GitHub Actions workflow to run the tests automatically on push or pull request to the main branch. The workflow is defined in `.github/workflows/main.yml`.
 
-The workflow performs the Unit tests, and also deploys the service via CloudFormation.
+The workflow performs the Unit tests, integration tests,  and also deploys the service via CloudFormation.
 
 ## Project Structure
 
@@ -51,10 +51,23 @@ The workflow performs the Unit tests, and also deploys the service via CloudForm
 ## Endpoints
 
  - **POST - https://qwzj7d4ouk.execute-api.us-east-1.amazonaws.com/dev/users**: Create a new User.
+  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Note:** All fields are required fields. Email must be unique.
+
+  ```json
+  {
+    "name": "John",
+    "lastname": "Doe",
+    "email": "john.doe@example2.com",
+    "dob": "1990-01-01"
+  }
+  ```
+
  - **GET - https://qwzj7d4ouk.execute-api.us-east-1.amazonaws.com/dev/users**: Retrieve all user with pagination.
  - **GET - https://qwzj7d4ouk.execute-api.us-east-1.amazonaws.com/dev/users/{UserID}**: Retrieve details of a specific user.
  - **PUT - https://qwzj7d4ouk.execute-api.us-east-1.amazonaws.com/dev/users/{UserID}**: Update details of a specific user.
  - **DELETE - https://qwzj7d4ouk.execute-api.us-east-1.amazonaws.com/dev/users/{UserID}**:  Delete a specific user.
+
 
 ## Error Handling
 
