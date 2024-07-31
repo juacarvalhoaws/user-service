@@ -29,6 +29,7 @@ provider:
             - dynamodb:GetItem
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
+            - dynamodb:Scan            
             - dynamodb:Query
 
 
@@ -41,24 +42,31 @@ functions:
     handler: handler.createUser
     events:
       - http:
-          path: users
+          path: /users
           method: post
           request:
             schemas:
               application/json: ${file(models/createUserModel.json)}
 
+  getAllUsers:
+    handler: handler.getAllUsers
+    events:
+      - http:
+          path: /users
+          method: get              
+
   getUser:
     handler: handler.getUser
     events:
       - http:
-          path: users/{UserID}
+          path: /users/{UserID}
           method: get
 
   updateUser:
     handler: handler.updateUser
     events:
       - http:
-          path: users/{UserID}
+          path: /users/{UserID}
           method: put
           request:
             schemas:
@@ -68,7 +76,7 @@ functions:
     handler: handler.deleteUser
     events:
       - http:
-          path: users/{UserID}
+          path: /users/{UserID}
           method: delete
 
 resources:

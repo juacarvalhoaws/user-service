@@ -1,6 +1,6 @@
 const { mockClient } = require('aws-sdk-client-mock');
-const { DynamoDBDocumentClient, PutCommand, GetCommand, UpdateCommand, DeleteCommand, QueryCommand } = require("@aws-sdk/lib-dynamodb");
-const { createUser, getUser, updateUser, deleteUser } = require('../handler');
+const { DynamoDBDocumentClient, PutCommand, GetCommand, UpdateCommand, DeleteCommand, QueryCommand, ScanCommand } = require("@aws-sdk/lib-dynamodb");
+const { createUser, getAllUsers, getUser, updateUser, deleteUser } = require('../handler');
 
 const ddbMock = mockClient(DynamoDBDocumentClient);
 
@@ -66,6 +66,25 @@ describe('CRUD operations', () => {
       expect(JSON.parse(result.body)).toHaveProperty('error');
     });
   });
+
+  describe('getAllUsers', () => {
+    it('should retrieve all users successfully', async () => {
+      ddbMock.on(ScanCommand).resolves({ Items: [mockUser] });
+      const result = await getAllUsers({ queryStringParameters: { limit: '10' } });
+      expect(result.statusCode).toBe(200);
+      expect(JSON.parse(result.body)).toEqual({
+        items: [mockUser],
+        lastEvaluatedKey: null
+      });
+    });
+
+    it('should return server error on DynamoDB failure', async () => {
+      ddbMock.on(ScanCommand).rejects(new Error('DynamoDB error'));
+      const result = await getAllUsers({ queryStringParameters: {} });
+      expect(result.statusCode).toBe(500);
+      expect(JSON.parse(result.body)).toHaveProperty('error');
+    });
+  });  
 
   describe('getUser', () => {
     it('should retrieve a user successfully', async () => {

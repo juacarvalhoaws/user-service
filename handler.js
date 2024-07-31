@@ -1,5 +1,5 @@
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, PutCommand, GetCommand, UpdateCommand, DeleteCommand, QueryCommand } = require("@aws-sdk/lib-dynamodb");
+const { DynamoDBDocumentClient, PutCommand, GetCommand, UpdateCommand, DeleteCommand, QueryCommand, ScanCommand } = require("@aws-sdk/lib-dynamodb");
 const { v4: uuidv4 } = require("uuid");
 const Joi = require("joi");
 
@@ -64,6 +64,36 @@ module.exports.createUser = async (event) => {
     };
   }
 };
+
+module.exports.getAllUsers = async (event) => {
+  const limit = event.queryStringParameters ? parseInt(event.queryStringParameters.limit, 10) : 10;
+  const lastEvaluatedKey = event.queryStringParameters && event.queryStringParameters.lastEvaluatedKey 
+    ? JSON.parse(event.queryStringParameters.lastEvaluatedKey) 
+    : undefined;
+
+  const params = {
+    TableName: USERS_TABLE,
+    Limit: limit,
+    ExclusiveStartKey: lastEvaluatedKey,
+  };
+
+  try {
+    const result = await ddbDocClient.send(new ScanCommand(params));
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        items: result.Items,
+        lastEvaluatedKey: result.LastEvaluatedKey ? JSON.stringify(result.LastEvaluatedKey) : null,
+      }),
+    };
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: "Could not retrieve users" }),
+    };
+  }
+};
+
 
 module.exports.getUser = async (event) => {
   const params = {
