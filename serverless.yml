@@ -37,6 +37,9 @@ provider:
             - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.USERS_TABLE}
             - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.USERS_TABLE}/index/*
 
+  logs:
+    restApi: true            
+
 functions:
   createUser:
     handler: handler.createUser
@@ -117,3 +120,28 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
+
+    ApiGatewayCloudWatchLogsRole:
+      Type: AWS::IAM::Role
+      Properties: 
+        AssumeRolePolicyDocument: 
+          Version: "2012-10-17"
+          Statement: 
+            - Effect: "Allow"
+              Principal: 
+                Service: 
+                  - "apigateway.amazonaws.com"
+              Action: 
+                - "sts:AssumeRole"
+        Policies: 
+          - PolicyName: "ApiGatewayCloudWatchLogsPolicy"
+            PolicyDocument: 
+              Version: "2012-10-17"
+              Statement: 
+                - Effect: "Allow"
+                  Action: 
+                    - "logs:CreateLogGroup"
+                    - "logs:CreateLogStream"
+                    - "logs:PutLogEvents"
+                  Resource: "*"
+        RoleName: "serverlessApiGatewayCloudWatchRole"
