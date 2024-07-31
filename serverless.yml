@@ -42,46 +42,50 @@ provider:
 
 functions:
   createUser:
-    handler: handler.createUser
+    handler: src/handlers/createUser.createUser
     events:
       - http:
           path: /users
           method: post
+          cors: true
           request:
             schemas:
               application/json: ${file(models/createUserModel.json)}
 
   getAllUsers:
-    handler: handler.getAllUsers
+    handler: src/handlers/getAllUsers.getAllUsers
     events:
       - http:
           path: /users
           method: get              
+          cors: true
 
   getUser:
-    handler: handler.getUser
+    handler: src/handlers/getUser.getUser
     events:
       - http:
           path: /users/{UserID}
           method: get
+          cors: true
 
   updateUser:
-    handler: handler.updateUser
+    handler: src/handlers/updateUser.updateUser
     events:
       - http:
           path: /users/{UserID}
           method: put
+          cors: true          
           request:
             schemas:
               application/json: ${file(models/updateUserModel.json)}
 
   deleteUser:
-    handler: handler.deleteUser
+    handler: src/handlers/deleteUser.deleteUser
     events:
       - http:
           path: /users/{UserID}
           method: delete
-
+          cors: true
 resources:
   Resources:
     UsersTable:
@@ -145,3 +149,5 @@ resources:
                     - "logs:PutLogEvents"
                   Resource: "*"
         RoleName: "serverlessApiGatewayCloudWatchRole"
+
+
