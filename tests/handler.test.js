@@ -4,6 +4,8 @@ const { createUser, getAllUsers, getUser, updateUser, deleteUser } = require('..
 
 const ddbMock = mockClient(DynamoDBDocumentClient);
 
+const USERS_TABLE = process.env.USERS_TABLE;
+
 const mockUser = {
   UserID: '1',
   name: 'Albert',
